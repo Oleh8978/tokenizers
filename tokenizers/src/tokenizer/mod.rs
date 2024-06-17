@@ -849,9 +849,17 @@ where
             .iter()
             .filter_map(|id| {
                 self.added_vocabulary
-                    .id_to_token(*id, &self.model)
-                    .filter(|token| {
-                        !skip_special_tokens || !self.added_vocabulary.is_special_token(token)
+                    .simple_id_to_token(*id)
+                    .and_then(|token| {
+                        if skip_special_tokens && self.added_vocabulary.is_special_token(&token) {
+                            None
+                        } else if let Some(pre_tok) = &self.pre_tokenizer {
+                            let mut string = PreTokenizedString::from(token);
+                            pre_tok.pre_tokenize(&mut string);
+                            Some(string.original)
+                        } else {
+                            Some(token)
+                        }
                     })
             })
             .collect::<Vec<_>>();
@@ -1289,5 +1297,18 @@ where
         file.write_all(serialized.as_bytes())?;
 
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod test {
+
+    use crate::pre_tokenizers::byte_level;
+    use crate::tokenizer::Tokenizer;
+
+    #[cfg(feature = "http")]
+    #[test]
+    fn test_decoding_with_added_bpe() {
+        let tokenizer = Tokenizer::from_pretrained("gpt2", None);
     }
 }

@@ -873,6 +873,8 @@ where
             decoder.decode(tokens)
         } else {
             Ok(tokens.join(" "))
+        }
+    }
 }
 
 impl<M, N, PT, PP, D> TokenizerImpl<M, N, PT, PP, D>

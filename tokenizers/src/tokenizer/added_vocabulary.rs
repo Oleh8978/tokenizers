@@ -228,7 +228,8 @@ impl AddedVocabulary {
     }
 
     pub fn simple_id_to_token(&self, id: u32) -> Option<String> {
-        self.added_tokens_map_r.get(&id).map(|t| t.content.clone())
+        let token = self.added_tokens_map_r.get(&id).map(|t| t.content.clone());
+        token
     }
 
     //

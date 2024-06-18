@@ -856,14 +856,17 @@ where
                         } else if let Some(pre_tok) = &self.pre_tokenizer {
                             let mut string = PreTokenizedString::from(token);
                             pre_tok.pre_tokenize(&mut string);
+                            println!("Pre-tok String: {}", string.original);
                             Some(string.original)
                         } else {
+                            println!("String: {}", token);
                             Some(token)
                         }
                     })
+                    .or_else(|| self.model.id_to_token(*id))
             })
             .collect::<Vec<_>>();
-
+        println!("This should print: {:?}", tokens);
         if let Some(decoder) = &self.decoder {
             decoder.decode(tokens)
         } else {
@@ -1304,11 +1307,15 @@ where
 mod test {
 
     use crate::pre_tokenizers::byte_level;
-    use crate::tokenizer::Tokenizer;
+    use crate::AddedToken;
+    use crate::Tokenizer;
 
-    #[cfg(feature = "http")]
+    // #[cfg(feature = "http")]
     #[test]
     fn test_decoding_with_added_bpe() {
-        let tokenizer = Tokenizer::from_pretrained("gpt2", None);
+        let mut tokenizer = Tokenizer::from_pretrained("gpt2", None).unwrap();
+        tokenizer.add_tokens(&[AddedToken::from("ĠåĹİ", false)]);
+        let decoded = tokenizer.decode(&[0, 1, 3512, 50257], false);
+        println!("Fully decoded text{:?}", decoded.unwrap());
     }
 }

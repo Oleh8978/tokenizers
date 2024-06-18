@@ -1306,11 +1306,10 @@ where
 #[cfg(test)]
 mod test {
 
-    use crate::pre_tokenizers::byte_level;
     use crate::AddedToken;
     use crate::Tokenizer;
 
-    // #[cfg(feature = "http")]
+    #[cfg(feature = "http")]
     #[test]
     fn test_decoding_with_added_bpe() {
         let mut tokenizer = Tokenizer::from_pretrained("gpt2", None).unwrap();

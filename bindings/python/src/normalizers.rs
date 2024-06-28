@@ -438,15 +438,14 @@ impl PyPrepend {
     }
 }
 
-/// Bytelevel normalizer
+/// Bytelevel Normalizer
 #[pyclass(extends=PyNormalizer, module = "tokenizers.normalizers", name = "ByteLevel")]
 pub struct PyByteLevel {}
-
 #[pymethods]
 impl PyByteLevel {
     #[new]
     #[pyo3(text_signature = "(self)")]
-    fn new() -> (Self, PyByteLevel) {
+    fn new() -> (Self, PyNormalizer) {
         (PyByteLevel {}, ByteLevel::new().into())
     }
 }

@@ -851,24 +851,13 @@ where
             .iter()
             .filter_map(|id| {
                 self.added_vocabulary
-                    .simple_id_to_token(*id)
-                    .and_then(|token| {
-                        if skip_special_tokens && self.added_vocabulary.is_special_token(&token) {
-                            None
-                        } else if let Some(pre_tok) = &self.pre_tokenizer {
-                            let mut string = PreTokenizedString::from(token);
-                            pre_tok.pre_tokenize(&mut string);
-                            println!("Pre-tok String: {}", string.original);
-                            Some(string.original)
-                        } else {
-                            println!("String: {}", token);
-                            Some(token)
-                        }
+                    .id_to_token(*id, &self.model)
+                    .filter(|token| {
+                        !skip_special_tokens || !self.added_vocabulary.is_special_token(token)
                     })
-                    .or_else(|| self.model.id_to_token(*id))
             })
             .collect::<Vec<_>>();
-        println!("This should print: {:?}", tokens);
+
         if let Some(decoder) = &self.decoder {
             decoder.decode(tokens)
         } else {
